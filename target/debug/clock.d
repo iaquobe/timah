@@ -1,0 +1,1 @@
+/home/iaquobe/projects/timah/target/debug/clock: /home/iaquobe/projects/timah/src/io.rs /home/iaquobe/projects/timah/src/main.rs /home/iaquobe/projects/timah/src/shapes.rs /home/iaquobe/projects/timah/src/ui.rs
