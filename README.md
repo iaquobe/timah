@@ -1,6 +1,13 @@
 # timer
 
+## Done
+- timer
+- logging timers
+- loading timers
+
+
 ## TODO:
-- save timers in cache
-  - option to reset the timer, while still keeping history
-  - when opening show list of available timers
+- cleanup code
+- legend showing keys
+- code cleanup keybindings
+- button to delete timer

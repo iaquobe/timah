@@ -39,17 +39,12 @@ struct WindowState {
     files_win   :*mut i8, 
     files       :Vec<String>,
     selected    :usize,
-
-    // data about legend(bottom line showing keys)
-    legend_win  :*mut i8,
-    legend_show :bool,
-    legend_text :String,
 }
 
 pub fn ui_thread(rx: mpsc::Receiver<Event>){
     // init state
     let mut ws = match rx.recv().unwrap() {
-        Event::Init(name, times, legend) => init_state(name, times, legend),
+        Event::Init(name, times) => init_state(name, times),
         _                  => {panic!("expected init event")},
     };
 
@@ -67,15 +62,13 @@ pub fn ui_thread(rx: mpsc::Receiver<Event>){
             Event::NameClose              => { curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);},
             Event::TimersOpen(timers)     => { ws.files = timers; print_timers(&mut ws)},
             Event::TimersClose            => { wclear(ws.files_win); wrefresh(ws.files_win);},
-            Event::Init(_,_,_)            => {},
+            Event::Init(_,_)            => {},
             Event::TimersSelect(selected) => { ws.selected = selected; print_timers(&mut ws)},
-            Event::LegendToggle           => { ws.legend_show = !ws.legend_show },
-            Event::LegendText(legend)     => { ws.legend_text = legend; print_legend(&ws)},
         }
     }
 }
 
-fn init_state(name:String, times:Times, legend_text:String) -> WindowState{
+fn init_state(name:String, times:Times) -> WindowState{
     // Get the screen size
     let mut rows = 0;
     let mut cols = 0;
@@ -91,7 +84,6 @@ fn init_state(name:String, times:Times, legend_text:String) -> WindowState{
     let timer_win  = newwin(height, width, y         , x);
     let title_win  = newwin(1     , width, y - 1     , x); 
     let files_win  = newwin(height, width, y + height, x);
-    let legend_win = newwin(1     , cols , rows - 1  , 0);
 
     let title      = name.clone();
 
@@ -111,10 +103,6 @@ fn init_state(name:String, times:Times, legend_text:String) -> WindowState{
         files_show: false,
         files_win,
         selected: 0,
-
-        legend_text,
-        legend_win, 
-        legend_show: false,
     }
 }
 
@@ -128,7 +116,6 @@ fn resize_window(ws:&mut WindowState) {
     mvwin(ws.timer_win , y            , x);
     mvwin(ws.title_win , y - 1        , x);
     mvwin(ws.files_win , y + ws.height, x);
-    mvwin(ws.legend_win, ws.rows - 1  , 0);
 
     refresh();
     print_all(ws);
@@ -203,10 +190,3 @@ fn print_timers(ws:&mut WindowState){
     wrefresh(ws.files_win);
 }
 
-fn print_legend(ws: &WindowState){
-    if ws.legend_show {
-        wclear(ws.legend_win);
-        mvprintw(0, 0, &ws.legend_text);
-        wrefresh(ws.legend_win);
-    }
-}
