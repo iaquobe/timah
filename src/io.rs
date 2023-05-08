@@ -1,5 +1,5 @@
 
-use std::time::{Duration,Instant};
+use std::time::{Duration,SystemTime};
 use std::sync::mpsc::Sender;
 
 use chrono::prelude::*;
@@ -31,7 +31,7 @@ pub fn io_thread(tx: Sender<Event>){
         timer     : Timer{
             state    : TimerState::Paused,
             name     : String::from(""),
-            now      : Instant::now(),
+            now      : SystemTime::now(),
             interval : Duration::from_secs(1),
             start    : Local::now(),
             seconds  : 0,

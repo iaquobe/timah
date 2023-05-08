@@ -1,5 +1,5 @@
 use std::sync::mpsc::Sender;
-use std::time::{Duration,Instant};
+use std::time::{Duration,SystemTime};
 use chrono::prelude::*;
 use crate::io::{AppState,Event};
 
@@ -30,7 +30,7 @@ pub struct Timer {
     pub state   :TimerState,
     pub name    :String,
     pub seconds :i32,
-    pub now         :Instant,
+    pub now         :SystemTime,
     pub interval    :Duration,
     pub start       :DateTime<Local>,
 }
@@ -38,7 +38,7 @@ pub struct Timer {
 
 pub fn timer(tx: &Sender<Event>, state: &mut AppState) {
     // check if 1 second has elapsed
-    if state.timer.now.elapsed() >= state.timer.interval {
+    if state.timer.now.elapsed().unwrap() >= state.timer.interval {
         if let TimerState::Running = state.timer.state {
             state.timer.seconds += 1; 
 
