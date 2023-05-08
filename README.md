@@ -1,11 +1,8 @@
 # Timah
-Timah tracks the time you spend on different activities.
-You can create timers with different names and simply press pause and play to
-record the time. 
+Timah lets you create timers for different activities and track the time you
+spend on them.
 
-Say for instance you want to monitor how much you work, and how much time you
-spend on your classes at university. Then you can create a timer for each of
-those activities you want to monitor
+It saves the timestamps in `~/.cache/timah/` in an editable format.
 
 ![demo](./demo/timah.gif)
 
@@ -17,13 +14,14 @@ cd timah
 cargo install --path .
 ```
 
+Once installed you can start timah with `timah`
 
 ## Usage
 Timah has 3 modes: 
 
-- Nomal: here you can start/stop the timer
-- Rename: renames the current timer
-- Open: shows list of saved timers you can choose to use
+- Nomal: move to other modes or start/pause timer
+- Rename: rename current timer
+- Open: show list to open saved timer
 
 ### Normal 
 - `<space>`: starts/pauses timer: saves timestamps 
@@ -41,7 +39,6 @@ Timah has 3 modes:
 - `q/<esc>`: cancel open
 
 # TODO: 
-- readme with docs and gifs
-- timer toggleable between showing slice or total
-- timer reset 
-- legend showing keybindings
+- timer toggle able between slice(time since the last start) or total(all time tracked in cache)
+- timer reset(save reset in cache, which can be used for instance to reset every week to track the time in one week)
+- legend showing keybindings (the ones in usage)
