@@ -52,8 +52,8 @@ pub fn ui_thread(rx: mpsc::Receiver<Event>){
     print_all(&mut ws);
 
 
-    loop {
-        match rx.recv().unwrap() {
+    for event in rx {
+        match event {
             Event::Resize                 => { resize_window(&mut ws)},
             Event::Tick(times)            => { ws.times = times; print_time(&mut ws)},
             Event::Quit                   => break,

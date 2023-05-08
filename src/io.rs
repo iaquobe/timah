@@ -26,7 +26,7 @@ pub fn io_thread(tx: Sender<Event>){
         prev_name : String::from(""),
         selection : 0,
         timers    : vec![],
-        path      : String::from(shellexpand::tilde( "~/.cache/taimah/")),
+        path      : String::from(shellexpand::tilde( "~/.cache/timah/")),
 
         timer     : Timer{
             state    : TimerState::Paused,

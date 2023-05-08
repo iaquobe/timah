@@ -149,19 +149,19 @@ fn list_mode(tx: &Sender<Event>, state:&mut AppState, action:ActionList) -> Cont
         },
         Down    => {
             // change state
-            if state.selection < state.timers.len() - 1 { state.selection += 1; }
+            if state.selection + 1 < state.timers.len() { state.selection += 1; }
             // send to ui
             tx.send(Event::TimersSelect(state.selection)).unwrap();
         },
         Confirm => {
             // change state
             state.mode          = Mode::Normal;
-            state.timer.name    = state.timers[state.selection].clone();
+            state.timer.name    = state.timers.get(state.selection).unwrap_or(&String::from("")).clone();
             state.timer.seconds = files::read_timer(&state.path, &state.timer.name);
             // send to ui
             tx.send(Event::TimersSelect(0)).unwrap();
             tx.send(Event::TimersClose).unwrap();
-            tx.send(Event::NameTick(state.timers[state.selection].clone())).unwrap();
+            tx.send(Event::NameTick(state.timer.name.clone())).unwrap();
             tx.send(Event::NameClose).unwrap();
             tx.send(Event::Tick(Times::from(state.timer.seconds))).unwrap();
         },

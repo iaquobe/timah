@@ -40,12 +40,16 @@ pub fn read_timer(dir:&str, name:&str) -> i32 {
 
 
 pub fn read_timers(path:&str) -> Vec<String> {
-    fs::read_dir(shellexpand::tilde(path).as_ref()).unwrap()
-        .map(|path| {
-            String::from(path.unwrap()
-                         .path()
-                         .file_name()
-                         .unwrap_or_default()
-                         .to_string_lossy())})
-        .collect()
+    let path = shellexpand::tilde(path);
+    match fs::read_dir(path.as_ref()) {
+        Ok(dir) => {
+            dir.map(|path| { String::from(path.unwrap()
+                             .path()
+                             .file_name()
+                             .unwrap_or_default()
+                             .to_string_lossy())})
+                .collect()
+        },
+        Err(_) => {fs::create_dir(path.as_ref()).unwrap(); vec![]},
+    }
 }
