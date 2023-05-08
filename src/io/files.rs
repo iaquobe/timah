@@ -19,19 +19,23 @@ pub fn write_timer(dir:&str, name:&str, start:&DateTime<Local>, end:&DateTime<Lo
 pub fn read_timer(dir:&str, name:&str) -> i32 {
     // read file and add up all time splits 
     let path = Path::new(dir).join(name);
-    fs::read(path).unwrap()
-        .lines()
-        .fold(0, |sec, line| {
-            let line = line.unwrap();
-            let mut iter = line.split("---");
-            // try to read dates, otherwise its a reset char
-            match (iter.next().unwrap().parse::<DateTime<Local>>(), iter.next().unwrap().parse::<DateTime<Local>>()) {
-                (Ok(start), Ok(end)) => {
-                    sec + (end - start).num_seconds()
-                }, 
-                _ => 0,
-            }
-        }) as i32
+    match fs::read(path) {
+        Ok(file) => {
+            file.lines()
+                .fold(0, |sec, line| {
+                    let line = line.unwrap();
+                    let mut iter = line.split("---");
+                    // try to read dates, otherwise its a reset char
+                    match (iter.next().unwrap().parse::<DateTime<Local>>(), iter.next().unwrap().parse::<DateTime<Local>>()) {
+                        (Ok(start), Ok(end)) => {
+                            sec + (end - start).num_seconds()
+                        }, 
+                        _ => 0,
+                    }
+                }) as i32
+        },
+        Err(_) => 0, 
+    }
 }
 
 

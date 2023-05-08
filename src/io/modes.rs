@@ -54,6 +54,10 @@ fn normal_mode(tx: &Sender<Event>, state:&mut AppState, action:ActionNormal) -> 
         Quit        => {
             // change state
             tx.send(Event::Quit).unwrap();
+            if let TimerState::Running = state.timer.state {
+                let end = Local::now();
+                files::write_timer(&state.path, &state.timer.name, &state.timer.start, &end);
+            }
             //send to ui
             return Control::Break;
         },
@@ -105,7 +109,9 @@ fn name_mode(tx: &Sender<Event>, state:&mut AppState, action:ActionName) -> Cont
         Confirm => {
             // change state
             state.mode = Mode::Normal;
+            state.timer.seconds += files::read_timer(&state.path, &state.timer.name);
             //send to ui
+            tx.send(Event::Tick(Times::from(state.timer.seconds))).unwrap();
             tx.send(Event::NameClose).unwrap();
         },
         Delete  => {
@@ -157,7 +163,6 @@ fn list_mode(tx: &Sender<Event>, state:&mut AppState, action:ActionList) -> Cont
             tx.send(Event::TimersClose).unwrap();
             tx.send(Event::NameTick(state.timers[state.selection].clone())).unwrap();
             tx.send(Event::NameClose).unwrap();
-            tx.send(Event::Tick(Times::from(state.timer.seconds))).unwrap();
             tx.send(Event::Tick(Times::from(state.timer.seconds))).unwrap();
         },
     }
