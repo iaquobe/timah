@@ -16,3 +16,4 @@
 - when sleeping and then waking up again the timer does not update
 - change internal time to use current split time, and the sum of everything in the file
 - change to systemtime, so that sleep counts
+- save when quitting without pausing
