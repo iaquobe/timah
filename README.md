@@ -7,6 +7,8 @@ Say for instance you want to monitor how much you work, and how much time you
 spend on your classes at university. Then you can create a timer for each of
 those activities you want to monitor
 
+[](./demo/timah.gif)
+
 
 ## Installation
 ```
