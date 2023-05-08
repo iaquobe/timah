@@ -8,6 +8,7 @@ It saves the timestamps in `~/.cache/timah/` in an editable format.
 
 
 ## Installation
+First you need to have curses and curses devel installed, then you can run: 
 ```
 git clone https://github.com/iaquobe/timah
 cd timah 
