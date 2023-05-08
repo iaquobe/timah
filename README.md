@@ -24,19 +24,19 @@ Timah has 3 modes:
 - Open: shows list of saved timers you can choose to use
 
 ### Normal 
-`<space>`: starts/pauses timer: saves timestamps 
-`o`: open list of timers
-`n`: rename the current timer
-`q`: quit the program
+- `<space>`: starts/pauses timer: saves timestamps 
+- `o`: open list of timers
+- `n`: rename the current timer
+- `q`: quit the program
 
 ### Rename
-`<enter>`: confirm new name
-`<esc>`: cancel new name
+- `<enter>`: confirm new name
+- `<esc>`: cancel new name
 
 ### Open
-`<enter>`: confirm timer
-`j/k`: down/up
-`q/<esc>`: cancel open
+- `<enter>`: confirm timer
+- `j/k`: down/up
+- `q/<esc>`: cancel open
 
 # TODO: 
 - readme with docs and gifs
