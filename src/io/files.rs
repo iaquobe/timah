@@ -1,7 +1,8 @@
 use std::path::Path;
 use std::fs::{self,OpenOptions};
 use std::io::{Write,BufRead};
-use chrono::{Local,DateTime};
+use chrono::{Local,DateTime, Datelike};
+use crate::io::timer::Times;
 
 pub fn write_timer(dir:&str, name:&str, start:&DateTime<Local>, end:&DateTime<Local>) {
     let path = Path::new(&dir).join(&name);
@@ -16,25 +17,41 @@ pub fn write_timer(dir:&str, name:&str, start:&DateTime<Local>, end:&DateTime<Lo
 }
 
 
-pub fn read_timer(dir:&str, name:&str) -> i32 {
+pub fn read_timer(dir:&str, name:&str) -> Times {
     // read file and add up all time splits 
+    let now  = Local::now();
     let path = Path::new(dir).join(name);
     match fs::read(path) {
         Ok(file) => {
             file.lines()
-                .fold(0, |sec, line| {
+                .fold(Times{ day: 0, week: 0, month: 0, total: 0, split: 0, }, |mut times, line| {
                     let line = line.unwrap();
                     let mut iter = line.split("---");
                     // try to read dates, otherwise its a reset char
                     match (iter.next().unwrap().parse::<DateTime<Local>>(), iter.next().unwrap().parse::<DateTime<Local>>()) {
                         (Ok(start), Ok(end)) => {
-                            sec + (end - start).num_seconds()
+                            let split = (end - start).num_seconds() as i32;
+
+                            times.total += split;
+                            if start.year() == now.year() {
+                                if start.month() == now.month() {
+                                    times.month += split;
+                                }
+                                if start.iso_week() == now.iso_week() {
+                                    times.week += split;
+                                }
+                                if start.day() == now.day() {
+                                    times.day += split;
+                                }
+                            }
+
+                            times
                         }, 
-                        _ => 0,
+                        _ => Times{ day: 0, week: 0, month: 0, total: 0, split: 0},
                     }
-                }) as i32
+                }) 
         },
-        Err(_) => 0, 
+        Err(_) => Times{ day: 0, week: 0, month: 0, total: 0, split: 0}, 
     }
 }
 

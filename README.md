@@ -40,6 +40,6 @@ Timah has 3 modes:
 - `q/<esc>`: cancel open
 
 # TODO: 
-- timer toggle able between slice(time since the last start) or total(all time tracked in cache)
+- timer toggle between (total, since reset, day, slice)
 - timer reset(save reset in cache, which can be used for instance to reset every week to track the time in one week)
 - legend showing keybindings (the ones in usage)

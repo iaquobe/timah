@@ -29,10 +29,11 @@ struct WindowState {
     // data about title window
     title_win   :*mut i8, 
     title       :String,
+    view        :String,
 
     // data about timer
     timer_win   :*mut i8, 
-    times       :Times,
+    clock       :Clock,
 
     // data about file(when opening other timers)
     files_show  :bool,
@@ -44,7 +45,7 @@ struct WindowState {
 pub fn ui_thread(rx: mpsc::Receiver<Event>){
     // init state
     let mut ws = match rx.recv().unwrap() {
-        Event::Init(name, times) => init_state(name, times),
+        Event::Init(name, clock, times) => init_state(name, clock, times),
         _                  => {panic!("expected init event")},
     };
 
@@ -55,20 +56,21 @@ pub fn ui_thread(rx: mpsc::Receiver<Event>){
     for event in rx {
         match event {
             Event::Resize                 => { resize_window(&mut ws)},
-            Event::Tick(times)            => { ws.times = times; print_time(&mut ws)},
+            Event::Tick(clock)            => { ws.clock = clock; print_time(&mut ws)},
             Event::Quit                   => break,
+            Event::NameView(view)         => { ws.view = view; print_title(&mut ws)},
             Event::NameOpen(name) 
                 | Event::NameTick(name)   => { curs_set(CURSOR_VISIBILITY::CURSOR_VISIBLE); ws.title = name; print_title(&mut ws)},
             Event::NameClose              => { curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);},
             Event::TimersOpen(timers)     => { ws.files = timers; print_timers(&mut ws)},
             Event::TimersClose            => { wclear(ws.files_win); wrefresh(ws.files_win);},
-            Event::Init(_,_)            => {},
+            Event::Init(_,_,_)            => {},
             Event::TimersSelect(selected) => { ws.selected = selected; print_timers(&mut ws)},
         }
     }
 }
 
-fn init_state(name:String, times:Times) -> WindowState{
+fn init_state(name:String, view: String, clock:Clock) -> WindowState{
     // Get the screen size
     let mut rows = 0;
     let mut cols = 0;
@@ -94,10 +96,11 @@ fn init_state(name:String, times:Times) -> WindowState{
         height,
 
         timer_win,
-        times,
+        clock,
 
         title_win,
         title,
+        view,
         files: vec![] ,
 
         files_show: false,
@@ -131,7 +134,7 @@ fn print_all(ws:&mut WindowState){
 
 
 fn print_time(ws: &WindowState){
-    let timer_str = format!("{:02}:{:02}:{:02}", ws.times.hours, ws.times.minutes, ws.times.seconds);
+    let timer_str = format!("{:02}:{:02}:{:02}", ws.clock.hours, ws.clock.minutes, ws.clock.seconds);
     let mut start = 0; 
 
     for c in timer_str.chars() {
@@ -155,7 +158,9 @@ fn print_time(ws: &WindowState){
 
 fn print_title(ws: &WindowState){
     wclear(ws.title_win);
-    mvwprintw(ws.title_win, 0, 0, ws.title.as_ref());
+    let offset = ws.width - (ws.view.len() as i32) - 1;
+    mvwprintw(ws.title_win, 0, 0     , &ws.title);
+    mvwprintw(ws.title_win, 0, offset, &ws.view);
     wrefresh(ws.title_win);
 }
 

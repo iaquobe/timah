@@ -22,12 +22,13 @@ pub struct AppState {
 
 /// all events that can be sent to the ui
 pub enum Event {
-    Init(String,Times),
+    Init(String,String,Clock),
     Quit,
     Resize,
-    Tick(Times),
+    Tick(Clock),
 
     NameOpen(String),
+    NameView(String),
     NameClose,
     NameTick(String),
 
@@ -91,12 +92,17 @@ fn normal_mode(tx: &Sender<Event>, state:&mut AppState, action:ActionNormal) -> 
         },
         SwitchView  => {
             // change state
+            use TimeView::*;
             state.timer.view = match state.timer.view {
-                TimeView::Total => TimeView::Split,
-                TimeView::Split => TimeView::Total,
+                Total => Month,
+                Month => Week,
+                Week  => Day,
+                Day   => Split,
+                Split => Total,
             };
             // send to ui
-            tx.send(Event::Tick(state.timer.get_times())).unwrap();
+            tx.send(Event::NameView(state.timer.get_view())).unwrap();
+            tx.send(Event::Tick(state.timer.get_clock())).unwrap();
         }
     }
 
@@ -118,9 +124,9 @@ fn name_mode(tx: &Sender<Event>, state:&mut AppState, action:ActionName) -> Cont
         Confirm => {
             // change state
             state.mode = Mode::Normal;
-            state.timer.seconds_total += files::read_timer(&state.path, &state.timer.name);
+            state.timer.times = files::read_timer(&state.path, &state.timer.name);
             //send to ui
-            tx.send(Event::Tick(state.timer.get_times())).unwrap();
+            tx.send(Event::Tick(state.timer.get_clock())).unwrap();
             tx.send(Event::NameClose).unwrap();
         },
         Delete  => {
@@ -166,13 +172,13 @@ fn list_mode(tx: &Sender<Event>, state:&mut AppState, action:ActionList) -> Cont
             // change state
             state.mode          = Mode::Normal;
             state.timer.name    = state.timers.get(state.selection).unwrap_or(&String::from("")).clone();
-            state.timer.seconds_total = files::read_timer(&state.path, &state.timer.name);
+            state.timer.times = files::read_timer(&state.path, &state.timer.name);
             // send to ui
             tx.send(Event::TimersSelect(0)).unwrap();
             tx.send(Event::TimersClose).unwrap();
             tx.send(Event::NameTick(state.timer.name.clone())).unwrap();
             tx.send(Event::NameClose).unwrap();
-            tx.send(Event::Tick(state.timer.get_times())).unwrap();
+            tx.send(Event::Tick(state.timer.get_clock())).unwrap();
         },
     }
     Control::Continue

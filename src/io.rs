@@ -15,7 +15,7 @@ use keybinds::Mode;
 use modes::*;
 use timer::*;
 
-pub use timer::Times;
+pub use timer::Clock;
 pub use modes::Event;
 
 
@@ -35,13 +35,11 @@ pub fn io_thread(tx: Sender<Event>){
             now      : SystemTime::now(),
             interval : Duration::from_secs(1),
             start    : Local::now(),
-            seconds_total  : 0,
-            seconds_split  : 0,
+            times    : Times { total: 0, split: 0, day: 0, week: 0, month: 0 },
         },
     };
 
-
-    tx.send(Event::Init(state.timer.name.clone(), state.timer.get_times())).unwrap();
+    tx.send(Event::Init(state.timer.name.clone(), state.timer.get_view(), state.timer.get_clock())).unwrap();
 
     loop {
         let c = getch(); 
