@@ -5,6 +5,7 @@ pub enum ActionNormal {
     Quit,
     OpenList,
     Rename,
+    SwitchView,
 }
 
 pub enum ActionName {
@@ -46,12 +47,14 @@ pub fn get_action(mode:&Mode, c:i32) -> Action {
     const O:i32 = 'o' as i32;
     const J:i32 = 'j' as i32;
     const K:i32 = 'k' as i32;
+    const T:i32 = 't' as i32;
 
     match mode {
         Mode::Normal => { match c {
             Q       => Action::Normal(ActionNormal::Quit),
             O       => Action::Normal(ActionNormal::OpenList),
             N       => Action::Normal(ActionNormal::Rename),
+            T       => Action::Normal(ActionNormal::SwitchView),
             SPACE   => Action::Normal(ActionNormal::Pause),
             _       => Action::None,
         }},

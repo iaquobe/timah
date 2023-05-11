@@ -26,13 +26,30 @@ impl From<i32> for Times {
     }
 }
 
+pub enum TimeView {
+    Total,
+    Split,
+}
+
 pub struct Timer {
+    pub view    :TimeView,
     pub state   :TimerState,
     pub name    :String,
-    pub seconds :i32,
     pub now         :SystemTime,
     pub interval    :Duration,
     pub start       :DateTime<Local>,
+
+    pub seconds_total  :i32,
+    pub seconds_split  :i32,
+}
+
+impl Timer {
+    pub fn get_times(&self) -> Times {
+        match self.view {
+            TimeView::Total => Times::from(self.seconds_total + self.seconds_split),
+            TimeView::Split => Times::from(self.seconds_split),
+        }
+    }
 }
 
 
@@ -40,9 +57,9 @@ pub fn timer(tx: &Sender<Event>, state: &mut AppState) {
     // check if 1 second has elapsed
     if state.timer.now.elapsed().unwrap() >= state.timer.interval {
         if let TimerState::Running = state.timer.state {
-            state.timer.seconds += 1; 
+            state.timer.seconds_split += 1; 
 
-            tx.send(Event::Tick(Times::from(state.timer.seconds))).unwrap(); 
+            tx.send(Event::Tick(state.timer.get_times())).unwrap(); 
         }
         state.timer.now = state.timer.now + state.timer.interval; 
     }

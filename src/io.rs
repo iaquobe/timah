@@ -29,17 +29,19 @@ pub fn io_thread(tx: Sender<Event>){
         path      : String::from(shellexpand::tilde( "~/.cache/timah/")),
 
         timer     : Timer{
+            view     : TimeView::Total,
             state    : TimerState::Paused,
             name     : String::from(""),
             now      : SystemTime::now(),
             interval : Duration::from_secs(1),
             start    : Local::now(),
-            seconds  : 0,
+            seconds_total  : 0,
+            seconds_split  : 0,
         },
     };
 
 
-    tx.send(Event::Init(state.timer.name.clone(), Times::from(state.timer.seconds))).unwrap();
+    tx.send(Event::Init(state.timer.name.clone(), state.timer.get_times())).unwrap();
 
     loop {
         let c = getch(); 

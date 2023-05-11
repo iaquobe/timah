@@ -89,6 +89,15 @@ fn normal_mode(tx: &Sender<Event>, state:&mut AppState, action:ActionNormal) -> 
             // send to ui
             tx.send(Event::TimersOpen(state.timers.clone())).unwrap();
         },
+        SwitchView  => {
+            // change state
+            state.timer.view = match state.timer.view {
+                TimeView::Total => TimeView::Split,
+                TimeView::Split => TimeView::Total,
+            };
+            // send to ui
+            tx.send(Event::Tick(state.timer.get_times())).unwrap();
+        }
     }
 
     Control::Continue
@@ -109,9 +118,9 @@ fn name_mode(tx: &Sender<Event>, state:&mut AppState, action:ActionName) -> Cont
         Confirm => {
             // change state
             state.mode = Mode::Normal;
-            state.timer.seconds += files::read_timer(&state.path, &state.timer.name);
+            state.timer.seconds_total += files::read_timer(&state.path, &state.timer.name);
             //send to ui
-            tx.send(Event::Tick(Times::from(state.timer.seconds))).unwrap();
+            tx.send(Event::Tick(state.timer.get_times())).unwrap();
             tx.send(Event::NameClose).unwrap();
         },
         Delete  => {
@@ -157,13 +166,13 @@ fn list_mode(tx: &Sender<Event>, state:&mut AppState, action:ActionList) -> Cont
             // change state
             state.mode          = Mode::Normal;
             state.timer.name    = state.timers.get(state.selection).unwrap_or(&String::from("")).clone();
-            state.timer.seconds = files::read_timer(&state.path, &state.timer.name);
+            state.timer.seconds_total = files::read_timer(&state.path, &state.timer.name);
             // send to ui
             tx.send(Event::TimersSelect(0)).unwrap();
             tx.send(Event::TimersClose).unwrap();
             tx.send(Event::NameTick(state.timer.name.clone())).unwrap();
             tx.send(Event::NameClose).unwrap();
-            tx.send(Event::Tick(Times::from(state.timer.seconds))).unwrap();
+            tx.send(Event::Tick(state.timer.get_times())).unwrap();
         },
     }
     Control::Continue
