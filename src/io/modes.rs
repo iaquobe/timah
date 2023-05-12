@@ -71,9 +71,19 @@ fn normal_mode(tx: &Sender<Event>, state:&mut AppState, action:ActionNormal) -> 
                     TimerState::Paused
                 }, 
                 TimerState::Paused  => {
+                    // reset time slice
+                    state.timer.times.day   += state.timer.times.split;
+                    state.timer.times.week  += state.timer.times.split;
+                    state.timer.times.month += state.timer.times.split;
+                    state.timer.times.total += state.timer.times.split;
+                    state.timer.times.split = 0; 
+
                     state.timer.start = Local::now();
                     TimerState::Running
-                },}
+                },};
+
+            // update timer
+            tx.send(Event::Tick(state.timer.get_clock())).unwrap();
         },
         Rename      => {
             // change state
