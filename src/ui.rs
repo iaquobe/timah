@@ -169,6 +169,19 @@ fn print_timers(ws:&mut WindowState){
     wclear(ws.files_win);
     box_(ws.files_win, 0, 0);
 
+    // 
+
+    let (slice, selected) =
+    if ws.selected < FILES_SHOWN {
+        (ws.files.iter().take(FILES_SHOWN), ws.selected)
+    }
+    else {
+        (ws.files.iter().skip(ws.selected - FILES_SHOWN).into_iter().take(FILES_SHOWN), FILES_SHOWN - 1)
+    };
+
+
+    /*
+
     let (from, to, hi) = if  FILES_SHOWN >= ws.files.len() {
         (0, ws.files.len(), ws.selected)
     } else if ws.selected + FILES_SHOWN > ws.files.len() {
@@ -192,6 +205,7 @@ fn print_timers(ws:&mut WindowState){
         }
         row += 1; 
     }
+    */
     wrefresh(ws.files_win);
 }
 
