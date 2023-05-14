@@ -84,13 +84,13 @@ impl Timer {
 
 pub fn timer(tx: &Sender<Event>, state: &mut AppState) {
     // check if 1 second has elapsed
-    if state.timer.now.elapsed().unwrap() >= state.timer.interval {
+    if let Ok(elapsed) = state.timer.now.elapsed() {
+        let elapsed_seconds = elapsed.as_secs(); 
         if let TimerState::Running = state.timer.state {
-            state.timer.times.split += 1; 
-
+            state.timer.times.split += elapsed_seconds as i32;
             tx.send(Event::Tick(state.timer.get_clock())).unwrap(); 
         }
-        state.timer.now = state.timer.now + state.timer.interval; 
+        state.timer.now = state.timer.now + Duration::from_secs(elapsed_seconds);
     }
 }
 
