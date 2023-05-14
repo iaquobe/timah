@@ -128,7 +128,7 @@ fn resize_window(ws:&mut WindowState) {
 fn print_all(ws:&mut WindowState){
     print_time(ws);
     print_title(ws);
-    
+
     if ws.files_show { print_timers(ws); }
 }
 
@@ -169,43 +169,38 @@ fn print_timers(ws:&mut WindowState){
     wclear(ws.files_win);
     box_(ws.files_win, 0, 0);
 
-    // 
+    // create iter for the files that are shown
+    let (selected, iter) =
+        // on begin of the list, show highlight depending on the index
+        if ws.selected < FILES_SHOWN {
+            (ws.selected + 1, 
+             ws.files.iter()
+                 .skip(0)
+                 .take(FILES_SHOWN))
+        }
+        // if further down the list, then highlight will be the last timer
+        else {
+            (FILES_SHOWN, 
+             ws.files.iter()
+                 .skip(ws.selected - FILES_SHOWN + 1)
+                 .take(FILES_SHOWN))
+        };
 
-    let (slice, selected) =
-    if ws.selected < FILES_SHOWN {
-        (ws.files.iter().take(FILES_SHOWN), ws.selected)
-    }
-    else {
-        (ws.files.iter().skip(ws.selected - FILES_SHOWN).into_iter().take(FILES_SHOWN), FILES_SHOWN - 1)
-    };
-
-
-    /*
-
-    let (from, to, hi) = if  FILES_SHOWN >= ws.files.len() {
-        (0, ws.files.len(), ws.selected)
-    } else if ws.selected + FILES_SHOWN > ws.files.len() {
-        let len = ws.files.len(); 
-
-        (len - FILES_SHOWN, len, FILES_SHOWN + 1 + ws.selected - len)
-    } else {
-        (ws.selected, ws.selected + FILES_SHOWN, 1)
-    };
-
+    // print the files, and highligth the selected file
     let mut row = 1; 
-    for timer in &ws.files[from..to] {
-        if hi == row {
+    for timer in iter {
+        if selected == row {
             wattron(ws.files_win, A_REVERSE());
         }
 
         mvwprintw(ws.files_win, row as i32, 1, &timer);
 
-        if hi == row {
+        if selected == row {
             wattroff(ws.files_win, A_REVERSE());
         }
         row += 1; 
     }
-    */
+
     wrefresh(ws.files_win);
 }
 
