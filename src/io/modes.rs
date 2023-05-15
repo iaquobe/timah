@@ -134,7 +134,7 @@ fn name_mode(tx: &Sender<Event>, state:&mut AppState, action:ActionName) -> Cont
         Confirm => {
             // change state
             state.mode = Mode::Normal;
-            state.timer.times = files::read_timer(&state.path, &state.timer.name);
+            state.timer.times = files::select_timer(&state.path, &state.timer.name);
             //send to ui
             tx.send(Event::Tick(state.timer.get_clock())).unwrap();
             tx.send(Event::NameClose).unwrap();
@@ -182,7 +182,7 @@ fn list_mode(tx: &Sender<Event>, state:&mut AppState, action:ActionList) -> Cont
             // change state
             state.mode          = Mode::Normal;
             state.timer.name    = state.timers.get(state.selection).unwrap_or(&String::from("")).clone();
-            state.timer.times = files::read_timer(&state.path, &state.timer.name);
+            state.timer.times = files::select_timer(&state.path, &state.timer.name);
             // send to ui
             tx.send(Event::TimersSelect(0)).unwrap();
             tx.send(Event::TimersClose).unwrap();
