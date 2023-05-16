@@ -7,15 +7,17 @@ use crate::io::timer::Times;
 const ALL_TIMERS:&str = "All";
 
 pub fn write_timer(dir:&str, name:&str, start:&DateTime<Local>, end:&DateTime<Local>) {
-    let path = Path::new(&dir).join(&name);
-    if let Ok(mut file) = OpenOptions::new()
-        .write(true)
-            .append(true)
-            .create(true)
-            .open(path)
-            {
-                writeln!(file, "{}---{}", start, end).unwrap();
-            }
+    if name != ALL_TIMERS {
+        let path = Path::new(&dir).join(&name);
+        if let Ok(mut file) = OpenOptions::new()
+            .write(true)
+                .append(true)
+                .create(true)
+                .open(path)
+                {
+                    writeln!(file, "{}---{}", start, end).unwrap();
+                }
+    }
 }
 
 fn read_timer(path:&Path) -> Times {

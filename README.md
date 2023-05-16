@@ -39,9 +39,19 @@ Timah has 3 modes:
 - `j/k`: down/up
 - `q/<esc>`: cancel open
 
+
+
+
 # TODO: 
 - [X] timer toggle between (total, since reset, day, slice)
 - [X] timer reset(save reset in cache, which can be used for instance to reset every week to track the time in one week)
 - [ ] group timers(in directory) 
 - [ ] legend showing keybindings (the ones in usage)
 
+
+# design changes
+- toggle between showing all is not a separate timer
+- for this upon startup read all timers
+- when opening list, then read all files again, in case new timer was added
+- when opening timer, then read time again, in case times have changed
+- for this save list of timers, with times loaded
