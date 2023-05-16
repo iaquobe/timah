@@ -1,3 +1,4 @@
+use std::ops::Add;
 use std::sync::mpsc::Sender;
 use std::time::{Duration,SystemTime};
 use chrono::prelude::*;
@@ -26,12 +27,40 @@ impl From<i32> for Clock {
     }
 }
 
+
+
 pub struct Times {
     pub total  :i32,
     pub split  :i32,
     pub day    :i32,
     pub week   :i32,
     pub month  :i32,
+}
+
+impl Add for Times {
+    type Output = Self; 
+
+    fn add(self, rhs: Self) -> Self {
+        Self { 
+            split:  self.split  + rhs.split,
+            day:    self.day    + rhs.day,
+            week:   self.week   + rhs.week,
+            month:  self.month  + rhs.month,
+            total:  self.total  + rhs.total,
+        }
+    }
+}
+
+impl Default for Times {
+    fn default() -> Self {
+        Self { total: 0, split: 0, day: 0, week: 0, month: 0 }
+    }
+}
+
+
+pub enum TimeMode {
+    Total, 
+    Timer,
 }
 
 pub enum TimeView {
@@ -43,14 +72,20 @@ pub enum TimeView {
 }
 
 pub struct Timer {
+    // information relevant for ui
     pub view    :TimeView,
     pub state   :TimerState,
     pub name    :String,
+
+    // accumulation of realtime and logged time 
+    pub mode : TimeMode,
+    pub times: Times,
+    pub total: Times,
+
+    // realtime tracking
     pub now         :SystemTime,
     pub interval    :Duration,
     pub start       :DateTime<Local>,
-
-    pub times: Times,
 }
 
 impl Timer {
@@ -64,17 +99,29 @@ impl Timer {
             Total => String::from("Total"),
         }
     }
-}
 
-impl Timer {
+    pub fn get_name(&self) -> String {
+        self.name.clone().push_str("(All)");
+        match self.mode {
+            TimeMode::Timer => self.name.clone(),
+            TimeMode::Total => format!("{}(All)", self.name),
+        }
+    }
+
     pub fn get_clock(&self) -> Clock {
         use TimeView::*;
-        match self.view {
-            Total => Clock::from(self.times.total + self.times.split),
 
-            Month => Clock::from(self.times.month + self.times.split),
-            Week  => Clock::from(self.times.week  + self.times.split),
-            Day   => Clock::from(self.times.day   + self.times.split),
+        let times = match self.mode {
+            TimeMode::Timer => &self.times,
+            TimeMode::Total => &self.total,
+        };
+
+        match self.view {
+            Total => Clock::from(times.total + self.times.split),
+
+            Month => Clock::from(times.month + self.times.split),
+            Week  => Clock::from(times.week  + self.times.split),
+            Day   => Clock::from(times.day   + self.times.split),
 
             Split => Clock::from(self.times.split),
         }

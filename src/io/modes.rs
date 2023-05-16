@@ -1,4 +1,5 @@
 use std::sync::mpsc::Sender;
+use crate::io::files::read_all_timers;
 use crate::io::keybinds::*;
 use crate::io::timer::*;
 use crate::io::files;
@@ -113,7 +114,21 @@ fn normal_mode(tx: &Sender<Event>, state:&mut AppState, action:ActionNormal) -> 
             // send to ui
             tx.send(Event::NameView(state.timer.get_view())).unwrap();
             tx.send(Event::Tick(state.timer.get_clock())).unwrap();
-        }
+        },
+        SwitchTimeMode => {
+            // change state
+            state.timer.mode = match state.timer.mode {
+                TimeMode::Total => TimeMode::Timer,
+                TimeMode::Timer => {
+                    state.timer.total = read_all_timers(&state.path);
+                    TimeMode::Total
+                },
+            };
+            // send to ui
+            tx.send(Event::NameTick(state.timer.get_name())).unwrap();
+            tx.send(Event::NameClose).unwrap();
+            tx.send(Event::Tick(state.timer.get_clock())).unwrap();
+        },
     }
 
     Control::Continue
@@ -134,7 +149,7 @@ fn name_mode(tx: &Sender<Event>, state:&mut AppState, action:ActionName) -> Cont
         Confirm => {
             // change state
             state.mode = Mode::Normal;
-            state.timer.times = files::select_timer(&state.path, &state.timer.name);
+            state.timer.times = files::read_timer(&state.path, &state.timer.name);
             //send to ui
             tx.send(Event::Tick(state.timer.get_clock())).unwrap();
             tx.send(Event::NameClose).unwrap();
@@ -143,7 +158,7 @@ fn name_mode(tx: &Sender<Event>, state:&mut AppState, action:ActionName) -> Cont
             // change state
             state.timer.name.pop();
             // send to ui
-            tx.send(Event::NameTick(state.timer.name.clone())).unwrap();
+            tx.send(Event::NameTick(state.timer.get_name())).unwrap();
         },
         Type(c) => {
             // change state
@@ -182,7 +197,7 @@ fn list_mode(tx: &Sender<Event>, state:&mut AppState, action:ActionList) -> Cont
             // change state
             state.mode          = Mode::Normal;
             state.timer.name    = state.timers.get(state.selection).unwrap_or(&String::from("")).clone();
-            state.timer.times = files::select_timer(&state.path, &state.timer.name);
+            state.timer.times = files::read_timer(&state.path, &state.timer.name);
             // send to ui
             tx.send(Event::TimersSelect(0)).unwrap();
             tx.send(Event::TimersClose).unwrap();

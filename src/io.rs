@@ -35,7 +35,9 @@ pub fn io_thread(tx: Sender<Event>){
             now      : SystemTime::now(),
             interval : Duration::from_secs(1),
             start    : Local::now(),
-            times    : Times { total: 0, split: 0, day: 0, week: 0, month: 0 },
+            times    : Times::default(),
+            total    : Times::default(),
+            mode     : TimeMode::Timer,
         },
     };
 
