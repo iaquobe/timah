@@ -1,13 +1,7 @@
 use std::ops::Add;
-use std::sync::mpsc::Sender;
 use std::time::{Duration,SystemTime};
 use chrono::prelude::*;
-use crate::io::{AppState,Event};
-
-pub enum TimerState {
-    Paused, 
-    Running,
-}
+use super::{AppState,Event};
 
 pub struct Clock {
     pub seconds :i32,
@@ -58,12 +52,12 @@ impl Default for Times {
 }
 
 
-pub enum TimeMode {
+pub enum TimerAccumulate {
     Total, 
     Timer,
 }
 
-pub enum TimeView {
+pub enum TimeFrame {
     Total,
     Split,
     Day,
@@ -71,14 +65,20 @@ pub enum TimeView {
     Month,
 }
 
+pub enum TimerState {
+    Paused, 
+    Running,
+}
+
+
 pub struct Timer {
     // information relevant for ui
-    pub view    :TimeView,
+    pub view    :TimeFrame,
     pub state   :TimerState,
     pub name    :String,
 
     // accumulation of realtime and logged time 
-    pub mode : TimeMode,
+    pub mode : TimerAccumulate,
     pub times: Times,
     pub total: Times,
 
@@ -90,7 +90,7 @@ pub struct Timer {
 
 impl Timer {
     pub fn get_view(&self) -> String {
-        use TimeView::*;
+        use TimeFrame::*;
         match self.view {
             Split => String::from("Split"),
             Day   => String::from("Day"),
@@ -103,17 +103,17 @@ impl Timer {
     pub fn get_name(&self) -> String {
         self.name.clone().push_str("(All)");
         match self.mode {
-            TimeMode::Timer => self.name.clone(),
-            TimeMode::Total => format!("{}(All)", self.name),
+            TimerAccumulate::Timer => self.name.clone(),
+            TimerAccumulate::Total => format!("{}(All)", self.name),
         }
     }
 
     pub fn get_clock(&self) -> Clock {
-        use TimeView::*;
+        use TimeFrame::*;
 
         let times = match self.mode {
-            TimeMode::Timer => &self.times,
-            TimeMode::Total => &self.total,
+            TimerAccumulate::Timer => &self.times,
+            TimerAccumulate::Total => &self.total,
         };
 
         match self.view {
@@ -129,13 +129,13 @@ impl Timer {
 }
 
 
-pub fn timer(tx: &Sender<Event>, state: &mut AppState) {
+pub fn timer(state: &mut AppState) {
     // check if 1 second has elapsed
     if let Ok(elapsed) = state.timer.now.elapsed() {
         let elapsed_seconds = elapsed.as_secs(); 
         if let TimerState::Running = state.timer.state {
             state.timer.times.split += elapsed_seconds as i32;
-            tx.send(Event::Tick(state.timer.get_clock())).unwrap(); 
+            state.sender.send(Event::Tick(state.timer.get_clock())).unwrap(); 
         }
         state.timer.now = state.timer.now + Duration::from_secs(elapsed_seconds);
     }

@@ -3,12 +3,11 @@ use std::env;
 use std::sync::mpsc::{self, channel};
 use ncurses::*;
 
-mod shapes; 
 mod io; 
 mod ui; 
 
-use crate::io::*;
-use crate::ui::*;
+use io::*;
+use ui::*;
 
 
 

@@ -2,7 +2,7 @@ use std::path::Path;
 use std::fs::{self,OpenOptions};
 use std::io::{Write,BufRead};
 use chrono::{Local,DateTime, Datelike};
-use crate::io::timer::Times;
+use super::timer::Times;
 
 pub fn write_timer(dir:&str, name:&str, start:&DateTime<Local>, end:&DateTime<Local>) {
         let path = Path::new(&dir).join(&name);

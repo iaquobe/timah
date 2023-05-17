@@ -48,5 +48,5 @@ Timah has 3 modes:
 - [X] group timers(in directory) 
 - [ ] split modes into multiple files
 - [ ] cleanup state struct
-- [ ] rename timeview and timemode into timeframe, and timeaccumulated
+- [X] rename timeview and timemode into timeframe, and timeaccumulated
 - [ ] legend showing keybindings (the ones in usage)

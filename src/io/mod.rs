@@ -21,6 +21,7 @@ pub use modes::Event;
 
 pub fn io_thread(tx: Sender<Event>){
     let mut state = AppState{
+        sender    : tx,
         mode      : Mode::Normal,
 
         prev_name : String::from(""),
@@ -29,7 +30,7 @@ pub fn io_thread(tx: Sender<Event>){
         path      : String::from(shellexpand::tilde( "~/.cache/timah/")),
 
         timer     : Timer{
-            view     : TimeView::Total,
+            view     : TimeFrame::Total,
             state    : TimerState::Paused,
             name     : String::from(""),
             now      : SystemTime::now(),
@@ -37,26 +38,26 @@ pub fn io_thread(tx: Sender<Event>){
             start    : Local::now(),
             times    : Times::default(),
             total    : Times::default(),
-            mode     : TimeMode::Timer,
+            mode     : TimerAccumulate::Timer,
         },
     };
 
-    tx.send(Event::Init(state.timer.name.clone(), state.timer.get_view(), state.timer.get_clock())).unwrap();
+    state.sender.send(Event::Init(state.timer.name.clone(), state.timer.get_view(), state.timer.get_clock())).unwrap();
 
     loop {
         let c = getch(); 
 
         // mode independent inputs
         if c == KEY_RESIZE {
-            tx.send(Event::Resize).unwrap();
+            state.sender.send(Event::Resize).unwrap();
         }
 
         let action = keybinds::get_action(&state.mode, c);
-        if let Control::Break = handle_action(&tx, &mut state, action){
+        if let Control::Break = handle_action(&mut state, action){
             break;
         }
 
-        timer(&tx, &mut state);
+        timer(&mut state);
 
         napms(10);
     }

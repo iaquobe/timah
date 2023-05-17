@@ -6,7 +6,7 @@ pub enum ActionNormal {
     OpenList,
     Rename,
     SwitchView,
-    SwitchTimeMode,
+    SwitchTimerAccumulate,
 }
 
 pub enum ActionName {
@@ -57,7 +57,7 @@ pub fn get_action(mode:&Mode, c:i32) -> Action {
             O       => Action::Normal(ActionNormal::OpenList),
             N       => Action::Normal(ActionNormal::Rename),
             T       => Action::Normal(ActionNormal::SwitchView),
-            A       => Action::Normal(ActionNormal::SwitchTimeMode),
+            A       => Action::Normal(ActionNormal::SwitchTimerAccumulate),
             SPACE   => Action::Normal(ActionNormal::Pause),
             _       => Action::None,
         }},
