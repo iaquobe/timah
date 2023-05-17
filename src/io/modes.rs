@@ -77,6 +77,12 @@ fn normal_mode(tx: &Sender<Event>, state:&mut AppState, action:ActionNormal) -> 
                     state.timer.times.week  += state.timer.times.split;
                     state.timer.times.month += state.timer.times.split;
                     state.timer.times.total += state.timer.times.split;
+
+                    state.timer.total.day   += state.timer.times.split;
+                    state.timer.total.week  += state.timer.times.split;
+                    state.timer.total.month += state.timer.times.split;
+                    state.timer.total.total += state.timer.times.split;
+
                     state.timer.times.split = 0; 
 
                     state.timer.start = Local::now();
