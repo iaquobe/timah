@@ -1,6 +1,11 @@
 
 use super::*;
 
+enum CycleDirection {
+    Forward,
+    Backward,
+}
+
 /// handles possible actions in normal mode
 pub fn normal_mode(state:&mut AppState, action:ActionNormal) -> Control {
     use ActionNormal::*;
@@ -9,8 +14,10 @@ pub fn normal_mode(state:&mut AppState, action:ActionNormal) -> Control {
         Pause                   => pause(state),
         Rename                  => rename(state),
         OpenList                => open_list(state),
-        SwitchView              => switch_time_frame(state),
+        TimeFrameNext           => switch_time_frame(state, CycleDirection::Forward),
+        TimeFramePrevious       => switch_time_frame(state, CycleDirection::Backward),
         SwitchTimerAccumulate   => switch_timer_accumulate(state),
+        LegendToggle            => {state.sender.send(Event::LegendToggle).unwrap()}
     }
     Control::Continue
 }
@@ -64,6 +71,7 @@ fn rename(state:&mut AppState) {
     state.timer.name = String::from("");
     // send to ui
     state.sender.send(Event::NameOpen(state.timer.name.clone())).unwrap();
+    state.sender.send(Event::LegendUpdate(get_legend(&state.mode))).unwrap();
 }
 
 fn open_list(state:&mut AppState) {
@@ -73,18 +81,30 @@ fn open_list(state:&mut AppState) {
     state.timers = files::read_timers(&state.path);
     // send to ui
     state.sender.send(Event::TimersOpen(state.timers.clone())).unwrap();
+    state.sender.send(Event::LegendUpdate(get_legend(&state.mode))).unwrap();
 }
 
-fn switch_time_frame(state:&mut AppState) {
+fn switch_time_frame(state:&mut AppState, direction:CycleDirection) {
     // change state
     use TimeFrame::*;
-    state.timer.view = match state.timer.view {
-        Total => Month,
-        Month => Week,
-        Week  => Day,
-        Day   => Split,
-        Split => Total,
-    };
+    match direction {
+        CycleDirection::Forward => 
+            state.timer.view = match state.timer.view {
+                Total => Month,
+                Month => Week,
+                Week  => Day,
+                Day   => Split,
+                Split => Total,
+            },
+        CycleDirection::Backward => 
+            state.timer.view = match state.timer.view {
+                Total => Split,
+                Month => Total,
+                Week  => Month,
+                Day   => Week,
+                Split => Day,
+            },
+    }
     // send to ui
     state.sender.send(Event::NameView(state.timer.get_view())).unwrap();
     state.sender.send(Event::Tick(state.timer.get_clock())).unwrap();
@@ -104,3 +124,4 @@ fn switch_timer_accumulate(state:&mut AppState) {
     state.sender.send(Event::NameClose).unwrap();
     state.sender.send(Event::Tick(state.timer.get_clock())).unwrap();
 }
+

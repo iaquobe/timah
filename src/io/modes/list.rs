@@ -9,6 +9,7 @@ pub fn list_mode(state:&mut AppState, action:ActionList) -> Control {
             state.mode = Mode::Normal;
             // send to ui
             state.sender.send(Event::TimersClose).unwrap();
+            state.sender.send(Event::LegendUpdate(get_legend(&state.mode))).unwrap();
         },
         Up      => {
             // change state
@@ -33,7 +34,9 @@ pub fn list_mode(state:&mut AppState, action:ActionList) -> Control {
             state.sender.send(Event::NameTick(state.timer.name.clone())).unwrap();
             state.sender.send(Event::NameClose).unwrap();
             state.sender.send(Event::Tick(state.timer.get_clock())).unwrap();
+            state.sender.send(Event::LegendUpdate(get_legend(&state.mode))).unwrap();
         },
+        LegendToggle            => {state.sender.send(Event::LegendToggle).unwrap()}
     }
     Control::Continue
 }

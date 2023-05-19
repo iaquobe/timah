@@ -10,6 +10,7 @@ pub fn rename_mode(state:&mut AppState, action:ActionName) -> Control {
             state.mode       = Mode::Normal;
             // send to ui
             state.sender.send(Event::NameClose).unwrap();
+            state.sender.send(Event::LegendUpdate(get_legend(&state.mode))).unwrap();
         },
         Confirm => {
             // change state
@@ -18,6 +19,7 @@ pub fn rename_mode(state:&mut AppState, action:ActionName) -> Control {
             //send to ui
             state.sender.send(Event::Tick(state.timer.get_clock())).unwrap();
             state.sender.send(Event::NameClose).unwrap();
+            state.sender.send(Event::LegendUpdate(get_legend(&state.mode))).unwrap();
         },
         Delete  => {
             // change state

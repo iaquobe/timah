@@ -42,7 +42,12 @@ pub fn io_thread(tx: Sender<Event>){
         },
     };
 
-    state.sender.send(Event::Init(state.timer.name.clone(), state.timer.get_view(), state.timer.get_clock())).unwrap();
+    state.sender.send(Event::Init{
+        timer       : state.timer.name.clone(),
+        timeframe   : state.timer.get_view(),
+        clock       : state.timer.get_clock(),
+        legend      : keybinds::get_legend(&state.mode),
+    }).unwrap();
 
     loop {
         let c = getch(); 

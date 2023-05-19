@@ -46,7 +46,7 @@ Timah has 3 modes:
 - [X] timer toggle between (total, since reset, day, slice)
 - [X] timer reset(save reset in cache, which can be used for instance to reset every week to track the time in one week)
 - [X] group timers(in directory) 
-- [ ] split modes into multiple files
+- [X] split modes into multiple files
 - [ ] cleanup state struct
 - [X] rename timeview and timemode into timeframe, and timeaccumulated
 - [ ] legend showing keybindings (the ones in usage)

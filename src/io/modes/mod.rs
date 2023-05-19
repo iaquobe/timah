@@ -34,7 +34,7 @@ pub struct AppState {
 
 /// all events that can be sent to the ui
 pub enum Event {
-    Init(String,String,Clock),
+    Init{timer:String, timeframe:String, legend:String, clock:Clock},
     Quit,
     Resize,
     Tick(Clock),
@@ -47,6 +47,9 @@ pub enum Event {
     TimersOpen(Vec<String>),
     TimersSelect(usize),
     TimersClose,
+
+    LegendUpdate(String),
+    LegendToggle,
 }
 
 /// delegates to action handler of the current mode
