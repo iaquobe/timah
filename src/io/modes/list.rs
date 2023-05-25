@@ -31,7 +31,7 @@ pub fn list_mode(state:&mut AppState, action:ActionList) -> Control {
             // send to ui
             state.sender.send(Event::TimersSelect(0)).unwrap();
             state.sender.send(Event::TimersClose).unwrap();
-            state.sender.send(Event::NameTick(state.timer.name.clone())).unwrap();
+            state.sender.send(Event::NameTick(state.timer.get_name())).unwrap();
             state.sender.send(Event::NameClose).unwrap();
             state.sender.send(Event::Tick(state.timer.get_clock())).unwrap();
             state.sender.send(Event::LegendUpdate(get_legend(&state.mode))).unwrap();
