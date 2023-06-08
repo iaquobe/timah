@@ -8,6 +8,12 @@ mod clock;
 mod shapes;
 mod legend;
 
+#[derive(PartialEq)]
+pub enum ClockFormat  {
+    HHMMSS,
+    HHHHMM,
+}
+
 pub struct WindowState {
     // general info about window
     rows    :i32,
@@ -22,6 +28,7 @@ pub struct WindowState {
 
     // data about timer
     timer_win   :*mut i8, 
+    timer_format:ClockFormat,
     clock       :Clock,
 
     // data about file(when opening other timers)
@@ -110,6 +117,7 @@ fn init_state(name:String, view: String, legend:String, clock:Clock) -> WindowSt
         clock,
 
         title_win,
+        timer_format: ClockFormat::HHMMSS,
         title,
         view,
         files: vec![] ,

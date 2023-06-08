@@ -27,7 +27,7 @@ pub fn list_mode(state:&mut AppState, action:ActionList) -> Control {
             // change state
             state.mode          = Mode::Normal;
             state.timer.name    = state.timers.get(state.selection).unwrap_or(&String::from("")).clone();
-            state.timer.times = files::read_timer(&state.path, &state.timer.name);
+            state.timer.times   = files::read_timer(&state.path, &state.timer.name);
             // send to ui
             state.sender.send(Event::TimersSelect(0)).unwrap();
             state.sender.send(Event::TimersClose).unwrap();

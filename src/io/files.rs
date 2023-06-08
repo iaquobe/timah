@@ -36,12 +36,12 @@ pub fn read_timer(path:&str, name:&str) -> Times {
                             if start.year() == now.year() {
                                 if start.month() == now.month() {
                                     times.month += split;
+                                    if start.day() == now.day() {
+                                        times.day += split;
+                                    }
                                 }
                                 if start.iso_week() == now.iso_week() {
                                     times.week += split;
-                                }
-                                if start.day() == now.day() {
-                                    times.day += split;
                                 }
                             }
 
