@@ -6,7 +6,7 @@ pub fn print(ws: &mut WindowState){
         if ws.clock.hours > 99 {
             (format!("{:04}:{:02}", ws.clock.hours, ws.clock.minutes), ClockFormat::HHHHMM) 
         } else {
-            (format!("{:02}:{:02}:{:02}", ws.clock.hours, ws.clock.minutes, ws.clock.seconds), ClockFormat::HHHHMM) 
+            (format!("{:02}:{:02}:{:02}", ws.clock.hours, ws.clock.minutes, ws.clock.seconds), ClockFormat::HHMMSS) 
         };
 
     let mut start = 0; 
