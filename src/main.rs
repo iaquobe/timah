@@ -10,7 +10,7 @@ use io::*;
 use ui::*;
 
 
-
+/// initializes ncurses and starts ui/io threads 
 fn main() {
     // for quick escape key
     env::set_var("ESCDELAY", "0");
@@ -27,11 +27,15 @@ fn main() {
     keypad(stdscr(), true);
     nodelay(stdscr(), true); 
 
+    // create channel between ui and io
     let (tx, rx): (mpsc::Sender<Event>, mpsc::Receiver<Event>) = channel();
 
+    // create io threads
     let io_thread    = thread::spawn(move|| {io_thread(tx)}); 
     let ui_thread    = thread::spawn(|| {ui_thread(rx)}); 
 
+
+    // exit program
     ui_thread.join().expect("could not join ui thread");
     io_thread.join().expect("could not join io thread");
 

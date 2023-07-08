@@ -13,7 +13,6 @@ mod timer;
 
 use keybinds::Mode;
 use modes::*;
-use timer::*;
 
 pub use timer::Clock;
 pub use modes::Event;
@@ -40,13 +39,16 @@ pub fn io_thread(tx: Sender<Event>){
             total    : Times::default(),
             mode     : TimerAccumulate::Timer,
         },
+        pomodore : Pomodore::default(), 
     };
 
     state.sender.send(Event::Init{
-        timer       : state.timer.name.clone(),
-        timeframe   : state.timer.get_view(),
-        clock       : state.timer.get_clock(),
-        legend      : keybinds::get_legend(&state.mode),
+        timer         : state.timer.name.clone(),
+        timeframe     : state.timer.get_view(),
+        clock         : state.timer.get_clock(),
+        legend        : keybinds::get_legend(&state.mode),
+        pomodore_clock: state.pomodore.get_clock(), 
+        pomodore      : state.pomodore.get_mode(),
     }).unwrap();
 
     loop {

@@ -10,6 +10,7 @@ pub enum ActionNormal {
     SwitchTimerAccumulate,
 
     LegendToggle,
+    ResetPomodore,
 }
 
 pub enum ActionName {
@@ -56,10 +57,12 @@ pub fn get_action(mode:&Mode, c:i32) -> Action {
     const K:i32 = 'k' as i32;
     const A:i32 = 'a' as i32;
     const T:i32 = 't' as i32;
+    const P:i32 = 'p' as i32;
     const T_U:i32 = 'T' as i32;
 
     match mode {
         Mode::Normal => { match c {
+            P       => Action::Normal(ActionNormal::ResetPomodore),
             Q       => Action::Normal(ActionNormal::Quit),
             O       => Action::Normal(ActionNormal::OpenList),
             N       => Action::Normal(ActionNormal::Rename),
@@ -71,8 +74,8 @@ pub fn get_action(mode:&Mode, c:i32) -> Action {
             _       => Action::None,
         }},
         Mode::Name   => { match c {
-            KEY_BACKSPACE => Action::Name(ActionName::Delete),
             ENTER         => Action::Name(ActionName::Confirm),
+            KEY_BACKSPACE => Action::Name(ActionName::Delete),
             ESC           => Action::Name(ActionName::Cancel),
             _             => match char::from_u32(c as u32) {
                 Some(ch)    => Action::Name(ActionName::Type(ch)),
@@ -91,7 +94,7 @@ pub fn get_action(mode:&Mode, c:i32) -> Action {
 
 pub fn get_legend(mode:&Mode) -> String {
     match mode {
-        Mode::Normal => String::from("quit(q), open timers(o), rename(n), switch timeframe(t/T), toggle accumulate(a), pause/start(space), toggle help(tab)"),
+        Mode::Normal => String::from("quit(q), open timers(o), rename(n), switch timeframe(t/T), toggle accumulate(a), pause/start(space), toggle help(tab), reset pomodore(p)"),
         Mode::Name   => String::from("confirm(enter), cancel(escape)"),
         Mode::List   => String::from("cancel(escape/q), confirm(enter), down/up(j/k), toggle help(tab)"),
     }

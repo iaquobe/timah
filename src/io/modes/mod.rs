@@ -1,14 +1,17 @@
-use std::sync::mpsc::Sender;
 use super::files::read_all_timers;
 use super::keybinds::*;
-use super::timer::*;
 use super::files;
 use chrono::prelude::*;
 
+pub use super::timer::*;
 
 mod list;
 mod normal;
 mod rename;
+mod event;
+mod app_state;
+pub use event::*;
+pub use app_state::*;
 
 /// weither the program should stop or not 
 pub enum Control {
@@ -16,41 +19,6 @@ pub enum Control {
     Break,
 }
 
-/// state of the app
-pub struct AppState {
-    // main state
-    pub sender    :Sender<Event>,
-    pub mode      :Mode,
-    pub timer     :Timer,
-
-    // list data
-    pub timers    :Vec<String>,
-    pub selection :usize, 
-
-    // other data 
-    pub path      :String,
-    pub prev_name :String,
-}
-
-/// all events that can be sent to the ui
-pub enum Event {
-    Init{timer:String, timeframe:String, legend:String, clock:Clock},
-    Quit,
-    Resize,
-    Tick(Clock),
-
-    NameOpen(String),
-    NameView(String),
-    NameClose,
-    NameTick(String),
-
-    TimersOpen(Vec<String>),
-    TimersSelect(usize),
-    TimersClose,
-
-    LegendUpdate(String),
-    LegendToggle,
-}
 
 /// delegates to action handler of the current mode
 pub fn handle_action(state:&mut AppState, action:Action) -> Control {
