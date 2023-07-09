@@ -1,4 +1,5 @@
 use std::sync::mpsc::Sender;
+use notify_rust::Notification;
 use super::*;
 
 pub enum PomodoreMode {
@@ -21,6 +22,15 @@ impl Default for Pomodore {
 }
 
 impl Pomodore {
+    /// returns the number of seconds in a certain mode
+    fn get_max(&self) -> i32 {
+        match self.mode {
+            PomodoreMode::Work       => 25 * 60,
+            PomodoreMode::Break      =>  5 * 60,
+            PomodoreMode::ShortBreak => 25 * 60,
+        }
+    }
+
     /// get name of pomodore mode
     pub fn get_mode(&self) -> String {
         match self.mode {
@@ -32,24 +42,13 @@ impl Pomodore {
 
     /// return remaining time of pomodore mode
     pub fn get_clock(&self) -> Clock {
-        let max = match self.mode {
-            PomodoreMode::Work       => 25 * 60,
-            PomodoreMode::Break      =>  5 * 60,
-            PomodoreMode::ShortBreak => 25 * 60,
-        };
-
-        Clock::from(max - self.time)
+        Clock::from(self.get_max() - self.time)
     }
 
     /// increases timer by seconds and send information about changed values to ui
     pub fn tick(&mut self, seconds: i32, sender: &Sender<Event>) {
         self.time += seconds;
-
-        let max = match self.mode {
-            PomodoreMode::Work       => 25 * 60,
-            PomodoreMode::Break      =>  5 * 60,
-            PomodoreMode::ShortBreak => 25 * 60,
-        };
+        let max = self.get_max();
 
         if self.time >= max {
             self.time -= max;
@@ -67,8 +66,13 @@ impl Pomodore {
                     }
                 },
             };
-
             sender.send(Event::PomodoreName(self.get_mode())).unwrap();
+
+            Notification::new()
+                .summary("Pomodore Timer")
+                .body(&self.get_mode())
+                .show()
+                .unwrap();
         }
         sender.send(Event::PomodoreTick(self.get_clock())).unwrap();
     }
