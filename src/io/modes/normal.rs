@@ -18,7 +18,7 @@ pub fn normal_mode(state:&mut AppState, action:ActionNormal) -> Control {
         TimeFramePrevious       => switch_time_frame(state, CycleDirection::Backward),
         SwitchTimerAccumulate   => switch_timer_accumulate(state),
         LegendToggle            => {state.sender.send(Event::LegendToggle).unwrap()},
-        ResetPomodore           => {state.pomodore = Pomodore::default();},
+        ResetPomodore           => {state.pomodore = Pomodore::default(); state.sender.send(Event::PomodoreTick(state.pomodore.get_clock())).unwrap();},
     }
     Control::Continue
 }

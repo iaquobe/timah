@@ -92,7 +92,7 @@ pub fn ui_thread(rx: mpsc::Receiver<Event>){
             Event::LegendUpdate(legend)   => { ws.legend = legend; legend::print(&ws)},
             Event::LegendToggle           => { ws.legend_show = !ws.legend_show; legend::print(&ws)},
 
-            Event::PomodoreName(name)     => { ws.pomodore_mode = name; pomodore::print(&mut ws)},
+            Event::PomodoreName(name)     => { wclear(ws.pomodore_win); ws.pomodore_mode = name; pomodore::print(&mut ws)},
             Event::PomodoreTick(clock)    => { ws.pomodore_clock = clock; pomodore::print(&mut ws)},
 
             Event::Init{ .. } => {},
@@ -157,10 +157,11 @@ fn resize_window(ws:&mut WindowState) {
     let y = (ws.rows - CHAR_HEIGHT) / 2;
     let x = (ws.cols - ws.width) / 2;
 
-    mvwin(ws.timer_win , y            , x);
-    mvwin(ws.title_win , y - 1        , x);
-    mvwin(ws.files_win , y + ws.height, x);
-    mvwin(ws.legend_win, ws.rows - 1  , 0);
+    mvwin(ws.timer_win   , y            , x);
+    mvwin(ws.title_win   , y - 1        , x);
+    mvwin(ws.files_win   , y + ws.height, x);
+    mvwin(ws.legend_win  , ws.rows - 1  , 0);
+    mvwin(ws.pomodore_win, y + ws.height, x);
 
     refresh();
     print_all(ws);

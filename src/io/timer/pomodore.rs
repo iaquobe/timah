@@ -26,8 +26,8 @@ impl Pomodore {
     fn get_max(&self) -> i32 {
         match self.mode {
             PomodoreMode::Work       => 25 * 60,
-            PomodoreMode::Break      =>  5 * 60,
-            PomodoreMode::ShortBreak => 25 * 60,
+            PomodoreMode::Break      => 25 * 60,
+            PomodoreMode::ShortBreak =>  5 * 60,
         }
     }
 
