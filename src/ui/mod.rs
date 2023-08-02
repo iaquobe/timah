@@ -45,6 +45,7 @@ pub struct WindowState {
     legend_win      :*mut i8,
 
     // data about pomodore timer
+    pomodore_enabled: bool,
     pomodore_clock  : Clock,
     pomodore_mode   : String, 
     pomodore_win    :*mut i8, 
@@ -94,6 +95,7 @@ pub fn ui_thread(rx: mpsc::Receiver<Event>){
 
             Event::PomodoreName(name)     => { wclear(ws.pomodore_win); ws.pomodore_mode = name; pomodore::print(&mut ws)},
             Event::PomodoreTick(clock)    => { ws.pomodore_clock = clock; pomodore::print(&mut ws)},
+            Event::PomodoreToggle         => { ws.pomodore_enabled = !ws.pomodore_enabled; wclear(ws.pomodore_win); wrefresh(ws.pomodore_win);},
 
             Event::Init{ .. } => {},
         }
@@ -144,6 +146,7 @@ fn init_state(name:String, view: String, legend:String, pomodore: String, clock:
         legend,
         legend_show: true,
 
+        pomodore_enabled: true,
         pomodore_win,
         pomodore_mode: pomodore,
         pomodore_clock, 

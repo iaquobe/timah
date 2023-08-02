@@ -10,7 +10,9 @@ pub enum ActionNormal {
     SwitchTimerAccumulate,
 
     LegendToggle,
-    ResetPomodore,
+
+    PomodoreReset,
+    PomodoreToggle,
 }
 
 pub enum ActionName {
@@ -58,11 +60,13 @@ pub fn get_action(mode:&Mode, c:i32) -> Action {
     const A:i32 = 'a' as i32;
     const T:i32 = 't' as i32;
     const P:i32 = 'p' as i32;
+    const P_U:i32 = 'P' as i32;
     const T_U:i32 = 'T' as i32;
 
     match mode {
         Mode::Normal => { match c {
-            P       => Action::Normal(ActionNormal::ResetPomodore),
+            P       => Action::Normal(ActionNormal::PomodoreReset),
+            P_U     => Action::Normal(ActionNormal::PomodoreToggle),
             Q       => Action::Normal(ActionNormal::Quit),
             O       => Action::Normal(ActionNormal::OpenList),
             N       => Action::Normal(ActionNormal::Rename),

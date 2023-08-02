@@ -21,4 +21,5 @@ pub enum Event {
 
     PomodoreTick(Clock),
     PomodoreName(String),
+    PomodoreToggle,
 }
